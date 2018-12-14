@@ -34,7 +34,6 @@ public class ForwardServer
     private String targetHost;
     private int targetPort;
 
-    private ServerSocket serverSocket;
     /**
      * Do handshake negotiation with client to authenticate, learn 
      * target host/port, etc.
@@ -48,8 +47,10 @@ public class ForwardServer
         /* This is where the handshake should take place */
         Handshake handshake = new Handshake();
         handshake.setAndSendServerHello(arguments.get("usercert"), arguments.get("cacert"), clientSocket);
-        serverSocket = new ServerSocket(0, 10, InetAddress.getLocalHost());
-        handshake.setAndSendSessionMessage(serverSocket.getInetAddress().toString(), Integer.toString(serverSocket.getLocalPort()), 128, clientSocket);
+        listenSocket = new ServerSocket(0, 10);
+        //listenSocket.bind(new InetSocketAddress(listenSocket.getLocalPort()));
+        System.out.println(listenSocket.getInetAddress() + " " + listenSocket.getLocalPort());
+        handshake.setAndSendSessionMessage(listenSocket.getInetAddress().toString(), Integer.toString(listenSocket.getLocalPort()), 128, clientSocket);
 
         clientSocket.close();
 
@@ -65,8 +66,6 @@ public class ForwardServer
          * Here, we use a static address instead (serverHost/serverPort). 
          * (This may give "Address already in use" errors, but that's OK for now.)
          */
-        listenSocket = new ServerSocket();
-        listenSocket.bind(new InetSocketAddress(handshake.getTargetHost(), handshake.getTargetPort()));
 
 
         /* The final destination. The ForwardServer sets up port forwarding
