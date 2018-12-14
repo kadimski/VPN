@@ -14,6 +14,7 @@
  */
  
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -32,7 +33,8 @@ public class ForwardServer
     private ServerSocket listenSocket;
     private String targetHost;
     private int targetPort;
-    
+
+    private ServerSocket serverSocket;
     /**
      * Do handshake negotiation with client to authenticate, learn 
      * target host/port, etc.
@@ -46,7 +48,8 @@ public class ForwardServer
         /* This is where the handshake should take place */
         Handshake handshake = new Handshake();
         handshake.setAndSendServerHello(arguments.get("usercert"), arguments.get("cacert"), clientSocket);
-        handshake.setAndSendSessionMessage("localhost", "6666", 128, clientSocket);
+        serverSocket = new ServerSocket(0, 10, InetAddress.getLocalHost());
+        handshake.setAndSendSessionMessage(serverSocket.getInetAddress().toString(), Integer.toString(serverSocket.getLocalPort()), 128, clientSocket);
 
         clientSocket.close();
 
