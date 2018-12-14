@@ -19,6 +19,11 @@ public class SessionEncrypter {
         this.IV = new IvParameterSpec(randomByteGenerator.generateSeed(16));
     }
 
+    public SessionEncrypter(SessionKey sessionKey, IvParameterSpec IV) {
+        this.sessionKey = sessionKey;
+        this.IV = IV;
+    }
+
     public CipherOutputStream openCipherOutputStream(OutputStream output) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
         Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
         cipher.init(Cipher.ENCRYPT_MODE, this.sessionKey.getSecretKey(), this.IV);

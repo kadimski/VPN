@@ -67,6 +67,8 @@ public class ForwardClient
          */
         serverHost = handshake.getServerHost();
         serverPort = handshake.getServerPort();
+
+
     }
 
     /*

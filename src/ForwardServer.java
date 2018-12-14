@@ -47,10 +47,9 @@ public class ForwardServer
         /* This is where the handshake should take place */
         Handshake handshake = new Handshake();
         handshake.setAndSendServerHello(arguments.get("usercert"), arguments.get("cacert"), clientSocket);
-        listenSocket = new ServerSocket(0, 10);
-        //listenSocket.bind(new InetSocketAddress(listenSocket.getLocalPort()));
-        System.out.println(listenSocket.getInetAddress() + " " + listenSocket.getLocalPort());
-        handshake.setAndSendSessionMessage(listenSocket.getInetAddress().toString(), Integer.toString(listenSocket.getLocalPort()), 128, clientSocket);
+        listenSocket = new ServerSocket(0, 10, InetAddress.getLocalHost());
+        System.out.println(InetAddress.getLocalHost().getHostAddress() + " " + listenSocket.getLocalPort());
+        handshake.setAndSendSessionMessage(InetAddress.getLocalHost().getHostAddress(), Integer.toString(listenSocket.getLocalPort()), 128, clientSocket);
 
         clientSocket.close();
 
