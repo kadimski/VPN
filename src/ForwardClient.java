@@ -107,7 +107,7 @@ public class ForwardClient
             Socket clientSocket = listensocket.accept();
             String clientHostPort = clientSocket.getInetAddress().getHostAddress() + ":" + clientSocket.getPort();
             log("Accepted client from " + clientHostPort);
-            
+
             forwardThread = new ForwardServerClientThread(clientSocket, serverHost, serverPort);
             forwardThread.start();
             

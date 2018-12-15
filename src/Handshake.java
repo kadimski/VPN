@@ -26,11 +26,11 @@ public class Handshake {
     //public static String targetHost = "localhost";
     //public static int targetPort = 6789;
 
-    public String targetHost;
-    public int targetPort;
+    private String targetHost;
+    private int targetPort;
 
-    public String serverHost;
-    public int serverPort;
+    private String serverHost;
+    private int serverPort;
 
     private HandshakeMessage clientHello;
     private HandshakeMessage serverHello;
