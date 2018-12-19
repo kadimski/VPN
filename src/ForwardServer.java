@@ -27,12 +27,13 @@ public class ForwardServer
     public static final String PROGRAMNAME = "ForwardServer";
     private static Arguments arguments;
 
-
     private ServerSocket handshakeSocket;
     
     private ServerSocket listenSocket;
     private String targetHost;
     private int targetPort;
+
+    private SessionDecrypter sessionDecrypter;
 
     /**
      * Do handshake negotiation with client to authenticate, learn 
@@ -48,7 +49,6 @@ public class ForwardServer
         Handshake handshake = new Handshake();
         handshake.setAndSendServerHello(arguments.get("usercert"), arguments.get("cacert"), clientSocket);
         listenSocket = new ServerSocket(0, 10, InetAddress.getLocalHost());
-        //System.out.println(InetAddress.getLocalHost().getHostAddress() + " " + listenSocket.getLocalPort() + " " + listenSocket.getLocalSocketAddress());
         handshake.setAndSendSessionMessage(InetAddress.getLocalHost().getHostAddress(), Integer.toString(listenSocket.getLocalPort()), 128, clientSocket);
 
         clientSocket.close();
@@ -72,6 +72,8 @@ public class ForwardServer
          */
         targetHost = handshake.getTargetHost();
         targetPort = handshake.getTargetPort();
+
+        sessionDecrypter = handshake.getSessionDecrypter();
     }
 
     /**
@@ -99,7 +101,7 @@ public class ForwardServer
 
                doHandshake();
 
-               forwardThread = new ForwardServerClientThread(this.listenSocket, this.targetHost, this.targetPort);
+               forwardThread = new ForwardServerClientThread(this.listenSocket, this.targetHost, this.targetPort, sessionDecrypter);
                forwardThread.start();
            } catch (IOException e) {
                throw e;

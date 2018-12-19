@@ -43,6 +43,9 @@ public class Handshake {
     private SessionKey sessionKey;
     private IvParameterSpec IV;
 
+    private SessionEncrypter sessionEncrypter;
+    private SessionDecrypter sessionDecrypter;
+
     public void setAndSendClientHello(String clientCertName, Socket socket) throws IOException, CertificateException {
         clientHello = new HandshakeMessage();
         System.out.println("ClientHello");
@@ -129,6 +132,7 @@ public class Handshake {
             sessionKey = new SessionKey(keyLength);
             SecureRandom randomByteGenerator = new SecureRandom();
             IV = new IvParameterSpec(randomByteGenerator.generateSeed(16));
+            sessionDecrypter = new SessionDecrypter(sessionKey, IV);
 
             PublicKey clientsPublicKey = clientCert.getPublicKey();
             Cipher cipherKey = Cipher.getInstance("RSA");
@@ -170,6 +174,8 @@ public class Handshake {
             sessionKey = new SessionKey(decryptedSessionKeyAsString);
             IV = new IvParameterSpec(decryptedIVAsBytes);
 
+            sessionEncrypter = new SessionEncrypter(sessionKey, IV);
+
             System.out.println("Handshake complete!");
         } else {
             System.out.println("Wrong type of parameter, expected Session.");
@@ -192,4 +198,9 @@ public class Handshake {
     public int getServerPort() {
         return serverPort;
     }
+
+    public SessionEncrypter getSessionEncrypter() { return sessionEncrypter; }
+
+    public SessionDecrypter getSessionDecrypter() { return sessionDecrypter; }
+
 }

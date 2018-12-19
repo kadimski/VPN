@@ -14,11 +14,15 @@
  * Peter Sjodin, KTH
  */
 
+import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 public class ForwardServerClientThread extends Thread
 {
@@ -31,6 +35,9 @@ public class ForwardServerClientThread extends Thread
     private String mServerHostPort;
     private int mServerPort;
     private String mServerHost;
+
+    private SessionEncrypter sessionEncrypter = null;
+    private SessionDecrypter sessionDecrypter = null;
 
     /**
      * Creates a client thread for handling clients of NakovForwardServer.
@@ -55,6 +62,35 @@ public class ForwardServerClientThread extends Thread
         //mServerHost =  listensocket.getInetAddress().getHostAddress();
         mServerPort = serverport;
         mServerHost = serverhost;
+    }
+
+    /**
+     * Creates a client thread for handling clients of NakovForwardServer.
+     * A client socket should be connected and passed to this constructor.
+     * A server socket is created later by run() method.
+     */
+    public ForwardServerClientThread(Socket aClientSocket, String serverhost, int serverport, SessionEncrypter sessionEncrypter)
+    {
+        mClientSocket = aClientSocket;
+        mServerPort = serverport;
+        mServerHost = serverhost;
+
+        this.sessionEncrypter = sessionEncrypter;
+    }
+
+    /**
+     * Creates a client thread for handling clients of NakovForwardServer.
+     * Wait for client to connect on client listening socket.
+     * A server socket is created later by run() method.
+     */
+    public ForwardServerClientThread(ServerSocket listensocket, String serverhost, int serverport, SessionDecrypter sessionDecrypter) throws IOException
+    {
+        mListenSocket = listensocket;
+        //mServerHost =  listensocket.getInetAddress().getHostAddress();
+        mServerPort = serverport;
+        mServerHost = serverhost;
+
+        this.sessionDecrypter = sessionDecrypter;
     }
 
     public ServerSocket getListenSocket() {
@@ -100,6 +136,12 @@ public class ForwardServerClientThread extends Thread
            InputStream serverIn = mServerSocket.getInputStream();
            OutputStream serverOut = mServerSocket.getOutputStream();
 
+           if (sessionEncrypter != null)
+               serverOut = sessionEncrypter.openCipherOutputStream(serverOut);
+
+           if (sessionDecrypter != null)
+               clientIn = sessionDecrypter.openCipherInputStream(clientIn);
+
            mServerHostPort = mServerHost + ":" + mServerPort;
            Logger.log("TCP Forwarding  " + mClientHostPort + " <--> " + mServerHostPort + "  started.");
  
@@ -112,6 +154,14 @@ public class ForwardServerClientThread extends Thread
  
         } catch (IOException ioe) {
            ioe.printStackTrace();
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
         }
     }
  
