@@ -1,0 +1,10 @@
+openssl req -new -x509 -newkey rsa:2048 -keyout capk.pem -out ca.pem
+
+openssl req -new -newkey rsa:2048 -keyout clientpk.pem -out client.pem
+
+openssl req -new -newkey rsa:2048 -keyout serverpk.pem -out server.pem
+
+openssl x509 -req -in client.csr -CA ca.pem -CAkey capk.pem -CAcreateserial -out client.pem
+
+openssl x509 -req -in server.csr -CA ca.pem -CAkey capk.pem -CAcreateserial -out server.pem
+
