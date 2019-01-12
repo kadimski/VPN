@@ -169,9 +169,9 @@ public class Handshake {
             cipherIV.init(Cipher.DECRYPT_MODE, clientsPrivateKey);
             byte[] decryptedSessionKeyAsBytes = cipherKey.doFinal(Base64.getDecoder().decode(fromServer.getParameter("SessionKey")));
             byte[] decryptedIVAsBytes = cipherIV.doFinal(Base64.getDecoder().decode(fromServer.getParameter("SessionIV")));
-            String decryptedSessionKeyAsString = new String(decryptedSessionKeyAsBytes);
+            //String decryptedSessionKeyAsString = new String(decryptedSessionKeyAsBytes);
 
-            sessionKey = new SessionKey(decryptedSessionKeyAsString);
+            sessionKey = new SessionKey(decryptedSessionKeyAsBytes);
             IV = new IvParameterSpec(decryptedIVAsBytes);
 
             sessionEncrypter = new SessionEncrypter(sessionKey, IV);
