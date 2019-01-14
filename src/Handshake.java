@@ -170,8 +170,9 @@ public class Handshake {
             byte[] decryptedSessionKeyAsBytes = cipherKey.doFinal(Base64.getDecoder().decode(fromServer.getParameter("SessionKey")));
             byte[] decryptedIVAsBytes = cipherIV.doFinal(Base64.getDecoder().decode(fromServer.getParameter("SessionIV")));
             //String decryptedSessionKeyAsString = new String(decryptedSessionKeyAsBytes);
+            String decryptedSessionKeyAsString = Base64.getEncoder().encodeToString(decryptedSessionKeyAsBytes);
 
-            sessionKey = new SessionKey(decryptedSessionKeyAsBytes);
+            sessionKey = new SessionKey(decryptedSessionKeyAsString);
             IV = new IvParameterSpec(decryptedIVAsBytes);
 
             sessionEncrypter = new SessionEncrypter(sessionKey, IV);
