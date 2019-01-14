@@ -41,6 +41,7 @@ public class ForwardClient
     private static String serverHost;
 
     private static SessionEncrypter sessionEncrypter;
+    private static SessionDecrypter sessionDecrypter;
 
     private static void doHandshake() throws IOException, CertificateException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
 
@@ -70,6 +71,7 @@ public class ForwardClient
         serverPort = handshake.getServerPort();
 
         sessionEncrypter = handshake.getSessionEncrypter();
+        sessionDecrypter = handshake.getSessionDecrypter();
     }
 
     /*
@@ -109,7 +111,7 @@ public class ForwardClient
             String clientHostPort = clientSocket.getInetAddress().getHostAddress() + ":" + clientSocket.getPort();
             log("Accepted client from " + clientHostPort);
 
-            forwardThread = new ForwardServerClientThread(clientSocket, serverHost, serverPort, sessionEncrypter);
+            forwardThread = new ForwardServerClientThread(clientSocket, serverHost, serverPort, sessionEncrypter, sessionDecrypter);
             forwardThread.start();
             
         } catch (IOException e) {

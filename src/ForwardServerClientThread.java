@@ -69,13 +69,14 @@ public class ForwardServerClientThread extends Thread
      * A client socket should be connected and passed to this constructor.
      * A server socket is created later by run() method.
      */
-    public ForwardServerClientThread(Socket aClientSocket, String serverhost, int serverport, SessionEncrypter sessionEncrypter)
+    public ForwardServerClientThread(Socket aClientSocket, String serverhost, int serverport, SessionEncrypter sessionEncrypter, SessionDecrypter sessionDecrypter)
     {
         mClientSocket = aClientSocket;
         mServerPort = serverport;
         mServerHost = serverhost;
 
         this.sessionEncrypter = sessionEncrypter;
+        this.sessionDecrypter = sessionDecrypter;
     }
 
     /**
@@ -83,7 +84,7 @@ public class ForwardServerClientThread extends Thread
      * Wait for client to connect on client listening socket.
      * A server socket is created later by run() method.
      */
-    public ForwardServerClientThread(ServerSocket listensocket, String serverhost, int serverport, SessionDecrypter sessionDecrypter) throws IOException
+    public ForwardServerClientThread(ServerSocket listensocket, String serverhost, int serverport, SessionDecrypter sessionDecrypter, SessionEncrypter sessionEncrypter) throws IOException
     {
         mListenSocket = listensocket;
         //mServerHost =  listensocket.getInetAddress().getHostAddress();
@@ -91,6 +92,7 @@ public class ForwardServerClientThread extends Thread
         mServerHost = serverhost;
 
         this.sessionDecrypter = sessionDecrypter;
+        this.sessionEncrypter = sessionEncrypter;
     }
 
     public ServerSocket getListenSocket() {
@@ -136,11 +138,15 @@ public class ForwardServerClientThread extends Thread
            InputStream serverIn = mServerSocket.getInputStream();
            OutputStream serverOut = mServerSocket.getOutputStream();
 
-           if (sessionEncrypter != null)
+           if (sessionEncrypter != null) {
                serverOut = sessionEncrypter.openCipherOutputStream(serverOut);
+               serverIn = sessionDecrypter.openCipherInputStream(serverIn);
+           }
 
-           if (sessionDecrypter != null)
+           if (sessionDecrypter != null) {
                clientIn = sessionDecrypter.openCipherInputStream(clientIn);
+               clientOut = sessionEncrypter.openCipherOutputStream(clientOut);
+           }
 
            mServerHostPort = mServerHost + ":" + mServerPort;
            Logger.log("TCP Forwarding  " + mClientHostPort + " <--> " + mServerHostPort + "  started.");

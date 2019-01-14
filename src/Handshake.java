@@ -133,6 +133,7 @@ public class Handshake {
             SecureRandom randomByteGenerator = new SecureRandom();
             IV = new IvParameterSpec(randomByteGenerator.generateSeed(16));
             sessionDecrypter = new SessionDecrypter(sessionKey, IV);
+            sessionEncrypter = new SessionEncrypter(sessionKey, IV);
 
             PublicKey clientsPublicKey = clientCert.getPublicKey();
             Cipher cipherKey = Cipher.getInstance("RSA");
@@ -176,6 +177,7 @@ public class Handshake {
             IV = new IvParameterSpec(decryptedIVAsBytes);
 
             sessionEncrypter = new SessionEncrypter(sessionKey, IV);
+            sessionDecrypter = new SessionDecrypter(sessionKey, IV);
 
             System.out.println("Handshake complete!");
         } else {

@@ -34,6 +34,7 @@ public class ForwardServer
     private int targetPort;
 
     private SessionDecrypter sessionDecrypter;
+    private SessionEncrypter sessionEncrypter;
 
     /**
      * Do handshake negotiation with client to authenticate, learn 
@@ -74,6 +75,7 @@ public class ForwardServer
         targetPort = handshake.getTargetPort();
 
         sessionDecrypter = handshake.getSessionDecrypter();
+        sessionEncrypter = handshake.getSessionEncrypter();
     }
 
     /**
@@ -101,7 +103,7 @@ public class ForwardServer
 
                doHandshake();
 
-               forwardThread = new ForwardServerClientThread(this.listenSocket, this.targetHost, this.targetPort, sessionDecrypter);
+               forwardThread = new ForwardServerClientThread(this.listenSocket, this.targetHost, this.targetPort, sessionDecrypter, sessionEncrypter);
                forwardThread.start();
            } catch (IOException e) {
                throw e;
