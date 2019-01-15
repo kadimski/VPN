@@ -140,7 +140,7 @@ public class Handshake {
             Cipher cipherIV = Cipher.getInstance("RSA");
             cipherKey.init(Cipher.ENCRYPT_MODE, clientsPublicKey);
             cipherIV.init(Cipher.ENCRYPT_MODE, clientsPublicKey);
-            byte[] encryptedSessionKeyAsBytes = cipherKey.doFinal(sessionKey.encodeKey().getBytes());
+            byte[] encryptedSessionKeyAsBytes = cipherKey.doFinal(sessionKey.getSecretKey().getEncoded());
             byte[] encryptedIVAsBytes = cipherIV.doFinal(IV.getIV());
 
             sessionMessage.putParameter("MessageType", "Session");
