@@ -136,12 +136,14 @@ public class Handshake {
             sessionEncrypter = new SessionEncrypter(sessionKey, IV);
 
             PublicKey clientsPublicKey = clientCert.getPublicKey();
-            Cipher cipherKey = Cipher.getInstance("RSA");
+            /*Cipher cipherKey = Cipher.getInstance("RSA");
             Cipher cipherIV = Cipher.getInstance("RSA");
             cipherKey.init(Cipher.ENCRYPT_MODE, clientsPublicKey);
             cipherIV.init(Cipher.ENCRYPT_MODE, clientsPublicKey);
             byte[] encryptedSessionKeyAsBytes = cipherKey.doFinal(sessionKey.getSecretKey().getEncoded());
-            byte[] encryptedIVAsBytes = cipherIV.doFinal(IV.getIV());
+            byte[] encryptedIVAsBytes = cipherIV.doFinal(IV.getIV());*/
+            byte[] encryptedSessionKeyAsBytes = HandshakeCrypto.encrypt(sessionKey.getSecretKey().getEncoded(), clientsPublicKey);
+            byte[] encryptedIVAsBytes = HandshakeCrypto.encrypt(IV.getIV(), clientsPublicKey);
 
             sessionMessage.putParameter("MessageType", "Session");
             sessionMessage.putParameter("SessionKey", Base64.getEncoder().encodeToString(encryptedSessionKeyAsBytes));
@@ -164,13 +166,14 @@ public class Handshake {
             serverPort = Integer.parseInt(fromServer.getParameter("ServerPort"));
 
             PrivateKey clientsPrivateKey = HandshakeCrypto.getPrivateKeyFromKeyFile(clientPrivateKeyName);
-            Cipher cipherKey = Cipher.getInstance("RSA");
+            /*Cipher cipherKey = Cipher.getInstance("RSA");
             Cipher cipherIV = Cipher.getInstance("RSA");
             cipherKey.init(Cipher.DECRYPT_MODE, clientsPrivateKey);
             cipherIV.init(Cipher.DECRYPT_MODE, clientsPrivateKey);
             byte[] decryptedSessionKeyAsBytes = cipherKey.doFinal(Base64.getDecoder().decode(fromServer.getParameter("SessionKey")));
-            byte[] decryptedIVAsBytes = cipherIV.doFinal(Base64.getDecoder().decode(fromServer.getParameter("SessionIV")));
-            //String decryptedSessionKeyAsString = new String(decryptedSessionKeyAsBytes);
+            byte[] decryptedIVAsBytes = cipherIV.doFinal(Base64.getDecoder().decode(fromServer.getParameter("SessionIV")));*/
+            byte[] decryptedSessionKeyAsBytes = HandshakeCrypto.decrypt(Base64.getDecoder().decode(fromServer.getParameter("SessionKey")), clientsPrivateKey);
+            byte[] decryptedIVAsBytes = HandshakeCrypto.decrypt(Base64.getDecoder().decode(fromServer.getParameter("SessionIV")), clientsPrivateKey);
             String decryptedSessionKeyAsString = Base64.getEncoder().encodeToString(decryptedSessionKeyAsBytes);
 
             sessionKey = new SessionKey(decryptedSessionKeyAsString);
