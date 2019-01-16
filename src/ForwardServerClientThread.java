@@ -138,12 +138,10 @@ public class ForwardServerClientThread extends Thread
            InputStream serverIn = mServerSocket.getInputStream();
            OutputStream serverOut = mServerSocket.getOutputStream();
 
-           if (sessionEncrypter != null) {
+           if (mListenSocket == null) {
                serverOut = sessionEncrypter.openCipherOutputStream(serverOut);
                serverIn = sessionDecrypter.openCipherInputStream(serverIn);
-           }
-
-           if (sessionDecrypter != null) {
+           } else {
                clientIn = sessionDecrypter.openCipherInputStream(clientIn);
                clientOut = sessionEncrypter.openCipherOutputStream(clientOut);
            }
